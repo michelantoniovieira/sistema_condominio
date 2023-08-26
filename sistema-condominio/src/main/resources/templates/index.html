@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Meu site</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/css/estilo.css">
+</head>
+
+<body style="background-color: whitesmoke;">
+
+<a href="/login" class="Sair">Sair</a>
+
+<!-- coloca a imagem centralizada no topo da pagina -->
+<div class="imageContainer">
+    <img src="/images/Calendário.png" alt="Calendário.png" width="3%" height="3%">
+</div>
+
+<!-- TABELA - MEUS AGENDAMENTOS APARTAMENTO 104 -->
+<table border="2" align="center" width="75%">
+    <tr>
+        <th colspan="3" class="academyName">GYM SCHEDULE</th>
+    </tr>
+    <tr>
+        <th colspan="3">Meus Agendamentos</th>
+    </tr>
+
+
+    <tr>
+        <td colspan="3">Olá, <span th:text="${session.loginUsuario}"></span>! Apartamento - <span th:text="${session.apartamentoUsuario}"></span></td>
+    </tr>
+    <tr>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Ação</th>
+    </tr>
+        </tr>
+
+        <tr class="centralizeItens" th:each="agendamento : ${agendamentos}">
+            <td th:text="${agendamento.dataFormatada}"></td>
+            <td th:text="${#strings.concat(agendamento.horario.descricao, ':00')}"></td>
+            <td>
+                <form th:action="@{/excluir}" method="post">
+                    <input type="hidden" name="id" th:value="${agendamento.id}" />
+                    <div class="d-grid gap-2 d-md-block">
+                        <button class="btn btn-primary" type="submit">Cancelar</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+    <br>
+    <br>
+
+    <!-- TABELA REALIZAÇÃO DE AGENDAMENTOS -->
+    <form action="/agendar" method="post" id="agendarForm">
+    <table border="2" align="center" width="75%">
+        <tr>
+            <th colspan="2">Realização de Agendamentos</th>
+        </tr>
+        <tr>
+            <td colspan="2" class="centralizeItens">
+                <input type="date" id="data" name="data">
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="2">
+                <label>Selecione o horário: </label>
+                <select id="idHorario" name="id_horario">
+                    <!-- Iterate over available time slots using Thymeleaf -->
+                    <option th:each="horario : ${horariosDisponiveis}" th:value="${horario.id}" th:text="${horario.descricao + 'h'}"></option>
+                </select>
+                <input type="hidden" id="idUsuario" name="id_usuario" th:value="${idUsuario}" />
+                <button id="btnAgendar" class="btn btn-primary" type="submit" disabled>Agendar</button>
+            </td>
+        </tr>
+    </table>
+    </form>
+
+    </td>
+        </tr>
+    </table>
+
+    <br>
+    <br>
+    <br>
+
+
+    <!-- LISTAGEM DE AGENDAMENTOS -->
+    <!-- LISTAGEM DE AGENDAMENTOS -->
+    <table id="conteudoDaPagina" border="2" align="center" width="75%">
+        <tr>
+            <th colspan="2" id="dataExibida">Listagem de Agendamentos - </th>
+        </tr>
+        <tr>
+            <th class="centralizeItens">Horários / Situação</th>
+        </tr>
+        <tr>
+            <td>
+                <style>
+                    #horariosContainer {
+                        display: flex;
+                        justify-content: center;
+                    }
+                </style>
+
+                <div id="horariosContainer">
+                    <!-- Itera sobre os horários disponíveis e gera as linhas da tabela -->
+                    <table>
+                        <tr th:each="horario : ${horariosDisponiveis}" class="centralizeItens">
+                            <td th:text="${#strings.concat(horario.descricao, ':00')}" style="text-align: center;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+
+
+
+    <script>
+        var dataInput = document.getElementById("data");
+        var dataExibida = document.getElementById("dataExibida");
+        var conteudoDaPagina = document.getElementById("conteudoDaPagina");
+
+        dataInput.addEventListener("change", function() {
+            var parts = dataInput.value.split("-");
+            var selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            var day = selectedDate.getDate();
+            var month = selectedDate.getMonth() + 1;
+            var year = selectedDate.getFullYear();
+            var formattedDate = `${year}-${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}`;
+
+            dataExibida.textContent = "Listagem de Agendamentos - " + formattedDate;
+
+            // Fazer a requisição GET ao servidor
+            fetch("/listarAgendamentosPorData?data=" + formattedDate)
+                .then(response => response.text())
+                .then(data => {
+                    // Atualizar o conteúdo da página com os resultados
+                    conteudoDaPagina.querySelector("#horariosContainer").innerHTML = data;
+                })
+                .catch(error => console.error("Erro na requisição: " + error));
+        });
+
+    </script>
+
+
+    <script>
+        var dataInput = document.getElementById("data");
+        var btnAgendar = document.getElementById("btnAgendar");
+
+        dataInput.addEventListener("change", function() {
+            if (dataInput.value) {
+                btnAgendar.removeAttribute("disabled");
+            } else {
+                btnAgendar.setAttribute("disabled", "disabled");
+            }
+        });
+    </script>
+
+
+
+
+
+    <br>
+    <br>
+    <br>
+</body>
+
+</html>
