@@ -1,4 +1,4 @@
-# sistema_condominio: Sistema de agendamento para uso da academia de um condominio solicitado na situação de aprendizagem 6.
+# Sistema de agendamento para uso de academia de um condominio solicitado na situação de aprendizagem 6, aproveitado para a SA5.
 
 Esse sistema foi elaborado para obtenção de nota na situação de aprendizagem 5 e 6
 
